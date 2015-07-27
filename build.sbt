@@ -5,6 +5,8 @@ import com.lihaoyi.workbench.Plugin._
 import spray.revolver.AppProcess
 import spray.revolver.RevolverPlugin.Revolver
 
+resolvers += Resolver.sonatypeRepo("snapshots")
+
 val wiki = crossProject.settings(
   scalaVersion := "2.11.6",
   version := "0.1-SNAPSHOT",
