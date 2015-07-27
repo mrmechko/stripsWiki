@@ -101,7 +101,9 @@ object Server extends SimpleRoutingApp with Api{
     val trips = onts.map(k => TGN(k._1))
     val wn = onts.flatMap(_._2).toList.distinct.map(k => WGN(k))
     val te = onts.map(e => GEdge(TGN(e._1), WGN(e._2.head)))
-    val we = onts.flatMap(o => o._2.sliding(2).map(l => GEdge(WGN(l(0)), WGN(l(1)))))
+    val we = onts.flatMap(o => if (o._2.size > 1) {
+      o._2.sliding(2).map(l => GEdge(WGN(l(0)), WGN(l(1))))
+    } else List[GEdge]())
     GGraph((wn ++ trips), (te ++ we))
   }
 
