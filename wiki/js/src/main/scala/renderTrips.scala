@@ -11,6 +11,17 @@ object ListOntItemRender {
       for (o <- onts) yield p(onclick := {() => change(o)})(o)
     )
   }.render
+
+  def apply(onts : (List[String], List[String]), change : String => Unit) = {
+    div(cls := "pure-g")(
+      div(cls := "pure-u-1-2")(
+        for (o <- onts._1) yield p(onclick := {() => change(o)})(o)
+      ),
+      div(cls := "pure-u-1-2")(
+        for (o <- onts._2) yield p(onclick := {() => change(o)})(o)
+      )
+    )
+  }.render
 }
 
 object OntItemRender {

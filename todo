@@ -1,0 +1,6 @@
+1. crash if the wrong wordnet sense is typed in
+2. allow different sense formats
+3. organize the code before it explodes
+4. submit a comment -- Requires a backend.  Save it as a map for now, then push it into redis or something
+5. some MVC shit to save comments as a list of scala objects
+6. going to need a second page with a list of forms for proposed modifications

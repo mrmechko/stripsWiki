@@ -5,35 +5,8 @@ import akka.actor.ActorSystem
 import scala.concurrent.ExecutionContext.Implicits.global
 import spray.http.{MediaTypes, HttpEntity}
 
-object Template{
-  import scalatags.Text.all._
-  import scalatags.Text.tags2.title
-  val txt =
-    "<!DOCTYPE html>" +
-    html(
-      head(
-        title("Example Scala.js application"),
-        link(rel :="stylesheet", href:="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"),
-        link(rel :="stylesheet", href:="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css"),
-        script(src := "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"),
-        script(src :="//cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"),
-        meta(name :="viewport", content :="width=device-width, initial-scale=1"),
-        meta(httpEquiv:="Content-Type", content:="text/html; charset=UTF-8"),
-        script(`type`:="text/javascript", src:="/client-fastopt.js"),
-        link(href:="http://fonts.googleapis.com/css?family=Cabin", rel:="stylesheet"),
-        script(src:="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js")
-        //script(`type`:="text/javascript", src:="//localhost:12345/workbench.js")
-        //link(
-        //  rel:="stylesheet",
-        //  `type`:="text/css",
-        //  href:="META-INF/resources/webjars/bootstrap/3.2.0/css/bootstrap.min.css"
-        //)
-      ),
-      body(style := "font-family: 'Cabin', sans-serif;")(
-        script("wiki.ScalaJSwiki().main()")
-      )
-    )
-}
+import wiki.Graph._
+
 object AutowireServer extends autowire.Server[String, upickle.default.Reader, upickle.default.Writer]{
   def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
   def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
@@ -63,6 +36,16 @@ object Server extends SimpleRoutingApp with Api{
             }
           }
         }
+      } ~
+      get {
+        path("graph" / Segment ){ s =>
+          complete{
+            HttpEntity(
+              MediaTypes.`text/html`,
+              Template.buildGraph(s, Server.mgfw(s))
+            )
+          }
+        }
       }
     }
   }
@@ -77,16 +60,70 @@ object Server extends SimpleRoutingApp with Api{
   import strips.util.OntologyFromXML
   val ont = SOntology(OntologyFromXML("/Users/mechko/nlpTools/flaming-tyrion/lexicon/data/"))
 
+  import strips.lexicon._
+  import strips.util.LexiconFromXML
+  lazy val lex = new TripsLexicon(LexiconFromXML("/Users/mechko/nlpTools/flaming-tyrion/lexicon/data/"))
+
   def getOnt(name : String) = {
     ont --> name
   }
 
-  def getComments(name : String) : List[Comment] = {
-    List(Comment("rik", "# %s\n `some code`".format(name)), Comment("omid", "test2"))
-  }
-
-  def getWordFromWN(word : String) : List[String] = {
+  def getOntsFromWNSense(word : String) : List[String] = {
     println(word)
     (ont !# word).map(_.name)
   }
+
+  def getOntsFromWordWN(word : String) : List[String] = {
+    println(word)
+    (ont !@ word).map(_.name)
+  }
+
+  def getTripsAndWN(word : String) : (List[String], List[String]) = {
+    val forms = (lex % word)
+    (forms.flatMap(f=>getOntsFromWordWN(f)).toList,
+    forms.flatMap(f => (lex --> f).flatMap(_.classes.map(_.ontType))).toList)
+  }
+
+  def graphImage(word : String) : String= {
+    //if dot file exists
+    val dot = makeGraphFromWord(word)
+    import scala.sys.process._
+    import java.io._
+    val pw = new PrintWriter(new File("dot/%s.dot".format(word)))
+    pw.write(dot.mkString("\n"))
+    pw.flush
+    pw.close
+    Seq("dot", "-oimg/%s.png".format(word), "-Tpng", "dot/%s.dot".format(word)) #| Seq("echo", "img/%s.png".format(word)) !!<
+  }
+
+  def mgfw(word : String) : GGraph = {
+    val onts = (ont !!@ word)
+    val trips = onts.map(k => TGN(k._1))
+    val wn = onts.flatMap(_._2).toList.distinct.map(k => WGN(k))
+    val te = onts.map(e => GEdge(TGN(e._1), WGN(e._2.head)))
+    val we = onts.flatMap(o => o._2.sliding(2).map(l => GEdge(WGN(l(0)), WGN(l(1)))))
+    GGraph((wn ++ trips), (te ++ we))
+  }
+
+  def makeGraphFromWord(word : String) : List[String] = {
+    val onts = (ont !!@ word)
+    onts.map(o => {
+      o._2.sliding(2).map(x => (nmlz(x(0)), nmlz(x(1)))).toList.+:((nmlz(o._2.head), nmlz(o._1)))
+    }).flatten.distinct.map(o=> "%s -> %s;".format(o._1, o._2)).+:("digraph {").:+("}")
+  }
+
+  var comments : Map[String, Set[Comment]] = Map().withDefault((s : String) => {Set[Comment](
+    Comment("rik", "# %s\n `some code`".format(s), target = s, uuid = Comment.uuid)
+  )})
+
+  def getComments(name : String) : List[Comment] = {
+    comments(name).toList
+  }
+
+  def addComment(comment : Comment) = {
+    //repace the existing one if it does
+    val rel = comments(comment.target).filter(x => x.uuid != comment.uuid) + comment
+    comments = comments.updated(comment.target, rel)
+  }
+
 }
