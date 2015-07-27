@@ -5,11 +5,11 @@ import com.lihaoyi.workbench.Plugin._
 import spray.revolver.AppProcess
 import spray.revolver.RevolverPlugin.Revolver
 
-resolvers += Resolver.sonatypeRepo("snapshots")
 
 val wiki = crossProject.settings(
   scalaVersion := "2.11.6",
   version := "0.1-SNAPSHOT",
+  resolvers += Resolver.sonatypeRepo("snapshots"),
   libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "upickle" % "0.3.4",
     "com.lihaoyi" %%% "autowire" % "0.2.5",
