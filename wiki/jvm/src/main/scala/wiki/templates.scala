@@ -6,19 +6,22 @@ object Template{
   import scalatags.Text.svgTags.svg
   import scalatags.Text.svgAttrs.{width, height}
   import wiki.Graph._
+
+
   val txt =
     "<!DOCTYPE html>" +
     html(
       head(
         title("Example Scala.js application"),
-        link(rel :="stylesheet", href:="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"),
+        script(src := "https://code.jquery.com/jquery-2.1.4.min.js"),
+        //link(rel :="stylesheet", href:="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"),
         link(rel :="stylesheet", href:="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css"),
         script(src := "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"),
         script(src :="//cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"),
         meta(name :="viewport", content :="width=device-width, initial-scale=1"),
         meta(httpEquiv:="Content-Type", content:="text/html; charset=UTF-8"),
         script(`type`:="text/javascript", src:="/client-fastopt.js"),
-        link(href:="http://fonts.googleapis.com/css?family=Cabin", rel:="stylesheet")
+        link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")
         //script(`type`:="text/javascript", src:="//localhost:12345/workbench.js")
         //link(
         //  rel:="stylesheet",
@@ -26,7 +29,7 @@ object Template{
         //  href:="META-INF/resources/webjars/bootstrap/3.2.0/css/bootstrap.min.css"
         //)
       ),
-      body(style := "font-family: 'Cabin', sans-serif;")(
+      body(cls := "%s %s".format(Colors.bodyColor, Colors.bodyText))(
         script("wiki.ScalaJSwiki().main()")
       )
     )

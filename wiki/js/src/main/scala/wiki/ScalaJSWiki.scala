@@ -6,6 +6,7 @@ import scala.util.Random
 import scala.concurrent.Future
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import scalatags.JsDom.all._
+import scalatags.JsDom._
 import upickle.default._
 import autowire._
 import strips.ontology._
@@ -36,26 +37,16 @@ object ScalaJSwiki {
   @JSExport
   def main(): Unit = {
 
-    val inputBox = input.render
-    val lookupTypes = select(
-      option("ont"),
-      option("word"),
-      option("sense"),
-      option("graph")
-    ).render
     val outputBox = div.render
     val comments = div.render
-    val theForm = form(cls := "pure-form")(
-      fieldset(
-        legend("search ontology"),
-        span(inputBox,
-        lookupTypes)
-        //,
-        //button(`type` := "submit", cls := "pure-button pure-button-primary")("search")
-      )
-    ).render
+    val inputBox = input(placeholder:="search", id:="search", `type`:="text").render
+    val lineProg = {
+      div(cls:="progress")(div(cls:="indeterminate")).render
+    }
 
     def listView : (String, Any) => Unit = (inp : String, lookupType : Any) => {
+      outputBox.innerHTML = ""
+      outputBox.appendChild(lineProg)
       lookupType match {
         case OntLookup => {
           ontView(inp)
@@ -91,7 +82,7 @@ object ScalaJSwiki {
         getComments("o:%s".format(inp))
         _render(Data.ont)
       } else {
-        dom.alert("loading from server: %s".format(inp))
+        //dom.alert("loading from server: %s".format(inp))
         getComments("o:%s".format(inp))
         Client[Api].getOnt(inp).call().foreach { result =>
           Data.ont = result
@@ -104,7 +95,7 @@ object ScalaJSwiki {
       val addComment : (Comment) => Unit = (c : Comment) => {
         Client[Api].addComment(c).call()
       }
-      
+
       Client[Api].getComments(name).call().foreach{ result =>
         Data.comments = result
         comments.innerHTML = ""
@@ -114,36 +105,78 @@ object ScalaJSwiki {
       }
     }
 
-    theForm.onsubmit = {e : dom.Event => {
-      if(lookupTypes.value == "ont")
-        listView(inputBox.value, OntLookup)
-      else if(lookupTypes.value == "word")
-        listView(inputBox.value, WordLookup)
-      else if(lookupTypes.value == "sense")
-        listView(inputBox.value, SenseLookup)
-      false;}
-    } /*{(e: dom.KeyboardEvent) => {
-        if (e.keyCode == KeyCode.enter)
-          updateOutput()
-        e.stopPropagation()
-      }
-    }*/
-    //ontView("")
-    dom.document.body.appendChild(
-      div(cls:= "pure-g")(
-          div(cls := "pure-u-1-24")(),
-          div(cls := "pure-u-12-24")(
-            h1("Ont Browser"),
-            //p("Enter an ont name"),
-            theForm,
-            outputBox
+    val lookupTypes = select(
+      option(value := "ont")("ont"),
+      option(value :="word")("word"),
+      option(value :="sense")("sense"),
+      option(value :="graph")("graph")
+    ).render
+
+    val spinner = {
+      div(cls:="preloader-wrapper big active")(
+        div(cls:="spinner-layer spinner-blue-only")(
+          div(cls:="circle-clipper left")(
+            div(cls:="circle")
           ),
-          div(cls := "pure-u-1-24")(),
-          div(cls := "pure-u-9-24")(
-            comments
+          div(cls:="gap-patch")(
+            div(cls:="circle")
           ),
-          div(cls := "pure-u-1-24")()
+          div(cls:="circle-clipper right")(
+            div(cls:="circle")
+          )
+        )
       ).render
-    )
+    }
+
+    val submitHandler = {e : dom.Event => {
+      if(lookupTypes.value == "ont")
+      listView(inputBox.value, OntLookup)
+      else if(lookupTypes.value == "word")
+      listView(inputBox.value, WordLookup)
+      else if(lookupTypes.value == "sense")
+      listView(inputBox.value, SenseLookup)
+      false;}
+    }
+
+    val theForm = form(onsubmit := submitHandler)(
+      div(cls:="row %s".format(Colors.sidebar))(
+        div(cls:="input-field col s4")(label("search"),inputBox),
+        div(cls:="input-field col s2")(lookupTypes),
+        div(cls:="input-field col s3")(button(cls :="waves-effect waves-light btn %s".format(Colors.defaultBtn), `type` := "submit")("Search"))
+      )
+      //,
+      //button(`type` := "submit", cls := "pure-button pure-button-primary")("search")
+    ).render
+    dom.document.body.appendChild(
+      div(style:="height:100%;")(
+        tags2.nav(cls := Colors.navColor, id:="navbar")(
+          div(cls :="nav-wrapper container")(
+            a(href:="#", cls:="brand-logo")("Trips Wiki"),
+            ul(id:="nav-mobile", cls:="right hide-on-med-and-down")(
+              li(a(href:="/")("browser")),
+              li(a(href:="/graph")("graph"))
+            )
+          )
+        ),
+        div(cls:= "row", id:="main", style := "height:100%;")(
+          div(cls := "col s12 %s %s".format(Colors.bodyColor, Colors.bodyText), style := "height:100%;")(
+            div(cls := "container")(
+              //p("Enter an ont name"),
+              theForm,
+              script(
+                raw(
+                  """$(document).ready(function() {
+                    $('select').material_select();
+                  });"""
+                )),
+                div(cls:= "row")(
+                  outputBox,
+                  comments
+                )
+              )
+            )
+          )
+        ).render
+      )
+    }
   }
-}
