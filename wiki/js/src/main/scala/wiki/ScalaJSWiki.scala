@@ -138,11 +138,13 @@ object ScalaJSwiki {
       false;}
     }
 
-    val theForm = form(onsubmit := submitHandler)(
-      div(cls:="row %s".format(Colors.sidebar))(
-        div(cls:="input-field col s4")(label("search"),inputBox),
-        div(cls:="input-field col s2")(lookupTypes),
-        div(cls:="input-field col s3")(button(cls :="waves-effect waves-light btn %s".format(Colors.defaultBtn), `type` := "submit")("Search"))
+    val theForm = form(onsubmit := submitHandler, style := "width:100%;")(
+      div(cls := "container")(
+        div(cls:="row %s".format(Colors.sidebar))(
+          div(cls:="input-field col s6")(label("search"),inputBox),
+          div(cls:="input-field col s3")(lookupTypes),
+          div(cls:="input-field col s3")(button(cls :="waves-effect waves-light btn %s".format(Colors.defaultBtn), `type` := "submit")("Search"))
+        )
       )
       //,
       //button(`type` := "submit", cls := "pure-button pure-button-primary")("search")
@@ -151,7 +153,7 @@ object ScalaJSwiki {
       div(style:="height:100%;")(
         tags2.nav(cls := Colors.navColor, id:="navbar")(
           div(cls :="nav-wrapper container")(
-            a(href:="#", cls:="brand-logo")("Trips Wiki"),
+            a(href:="#", cls:="brand-logo", style:="font-weight:200;")("Trips Wiki"),
             ul(id:="nav-mobile", cls:="right hide-on-med-and-down")(
               li(a(href:="/")("browser")),
               li(a(href:="/graph")("graph"))
@@ -170,8 +172,8 @@ object ScalaJSwiki {
                   });"""
                 )),
                 div(cls:= "row")(
-                  outputBox,
-                  comments
+                  div(cls := "col s6")(outputBox),
+                  div(cls := "col s6")(comments)
                 )
               )
             )

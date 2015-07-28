@@ -3,16 +3,19 @@ package wiki
 import strips.ontology._
 
 object Colors {
-  val base1 = "light-blue"
+  val base1 = "blue"
   val base2 = "indigo"
-  val bodyColor = "%s darken-4".format(base1)
+  val bodyColor = "%s accent-2".format(base1)
   val bodyText = "white-text"
   val container = base2
+  val commentBg = "blue darken-4"
   val containerText = "white-text"
   val navColor = "%s darken-4".format(base2)
   val defaultBtn = base1
   val sidebar = base2
   val footerColor = "%s accent-2".format(base2)
+  val accent1 = "red"
+  val accent2 = "purple darken-4"
 }
 
 trait Api{

@@ -22,26 +22,21 @@ object CommentRender {
   //add a a submit button
   def apply(c : Comment, update : (Comment) => Unit) : org.scalajs.dom.raw.Node = {
     val comment = div.render
-    val inputBox = textarea(value := c.body).render
+    val inputBox = textarea(cls := "materialize-textarea", `type`:="text", id:=c.uuid).render
+    inputBox.value = c.body
 
     GithubMarkdown.convert(c.body, comment)
-    val edit = form(cls := "pure-form")(
-      fieldset(
-        legend("search ontology"),
-        inputBox,
-        button(`type` := "submit", cls := "pure-button pure-button-primary")("submit")
-      )
-    ).render
+    val editBody = form(
+      div(cls := "input-field")(
+        inputBox
+      ),
+      button(`type` := "submit", cls := "btn %s".format(Colors.defaultBtn))("submit")
+      ).render
     val content = div(
-      ondblclick := { () => {
-          comment.innerHTML = ""
-          comment.appendChild(edit)
-        }
-      },
       comment
     ).render
 
-    edit.onsubmit = {e : dom.Event => {
+    editBody.onsubmit = {e : dom.Event => {
         val newcomment = c.copy(body = inputBox.value)
         update(newcomment)
         GithubMarkdown.convert(newcomment.body, comment)
@@ -49,9 +44,13 @@ object CommentRender {
       }
     }
 
-    div(cls := "card blue white-text")(
+    div(cls := "card %s white-text".format(Colors.commentBg))(
       div(cls := "card-content")(
-        div(c.author),
+        div(cls := "card-title row")(div(cls := "col s10")(c.author + " says:"), div(cls := "col s2")(a(cls := "btn btn-floating right-align", onclick := { () => {
+            comment.innerHTML = ""
+            comment.appendChild(editBody)
+          }
+        })(i(cls := "material-icons")("add")))),
         content
       )
     ).render
