@@ -37,6 +37,7 @@ object ScalaJSwiki {
   @JSExport
   def main(): Unit = {
 
+    val graphLink = a(href:="graph/")("graph").render
     val outputBox = div.render
     val comments = div.render
     val inputBox = input(placeholder:="search", id:="search", `type`:="text").render
@@ -44,13 +45,17 @@ object ScalaJSwiki {
       div(cls:="progress")(div(cls:="indeterminate")).render
     }
 
+    inputBox.onchange = {e : dom.Event => {
+      graphLink.href = "graph/"+inputBox.value
+    }}
+
     def listView : (String, Any) => Unit = (inp : String, lookupType : Any) => {
       outputBox.innerHTML = ""
       outputBox.appendChild(lineProg)
       lookupType match {
         case OntLookup => {
           ontView(inp)
-        }
+        }//Use buildList instead or ListOntItemRender
         case SenseLookup => {
           Client[Api].getOntsFromWNSense(inp).call().foreach { result =>
             outputBox.innerHTML = ""
@@ -138,6 +143,7 @@ object ScalaJSwiki {
       false;}
     }
 
+
     val theForm = form(onsubmit := submitHandler, style := "width:100%;")(
       div(cls := "container")(
         div(cls:="row %s".format(Colors.sidebar))(
@@ -156,7 +162,7 @@ object ScalaJSwiki {
             a(href:="#", cls:="brand-logo", style:="font-weight:200;")("Trips Wiki"),
             ul(id:="nav-mobile", cls:="right hide-on-med-and-down")(
               li(a(href:="/")("browser")),
-              li(a(href:="/graph")("graph"))
+              li(graphLink)
             )
           )
         ),
