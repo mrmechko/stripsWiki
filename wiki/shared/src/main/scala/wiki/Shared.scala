@@ -1,6 +1,19 @@
 package wiki
 
+case class WriteFile(name : String, old : String, res : String, user : String = "system")
+case class CreateFile(name : String, res : String)
+case object WriteSuccess
+case object WriteFail
+
 import strips.ontology._
+
+case class Authenticat(username : String, password : String)
+trait credentials
+case class LoginS(username : String, token : String) extends credentials
+case object LoginF extends credentials
+
+case class RegisterToken(user : String, token : String)
+case class BearToken(token : String)
 
 object Colors {
   val base1 = "blue"
@@ -21,11 +34,9 @@ object Colors {
 trait Api{
   def list(path: String): Seq[String]
   def getOnt(name : String) : Option[SOntItem]
-  def getComments(name : String) : List[Comment]
   def getOntsFromWNSense(word : String) : List[String]
   def getOntsFromWordWN(word : String) : List[String]
   def getTripsAndWN(word : String) : (List[String], List[String])
-  def addComment(comment : Comment)
 }
 
 case class Comment(author : String, body : String, target : String, uuid : String = "")

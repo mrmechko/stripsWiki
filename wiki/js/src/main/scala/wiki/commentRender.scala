@@ -19,40 +19,49 @@ object CommentRender {
   import scalatags.JsDom._
   import scalatags.JsDom.all._
 
-  //add a a submit button
-  def apply(c : Comment, update : (Comment) => Unit) : org.scalajs.dom.raw.Node = {
-    val comment = div.render
-    val inputBox = textarea(cls := "materialize-textarea", `type`:="text", id:=c.uuid).render
-    inputBox.value = c.body
 
-    GithubMarkdown.convert(c.body, comment)
+
+  //update : (String, Option[String]) => Unit
+  def apply(c : String, token : Option[String], update : (String, String) => Unit) : org.scalajs.dom.raw.Node = {
+    //dom.alert("loading: %s".format(c))
+    val comment = div.render
+    val inputBox = textarea(cls := "materialize-textarea", `type`:="text", id:="comment").render
+    inputBox.value = c
+
+    GithubMarkdown.convert(c, comment)
     val editBody = form(
       div(cls := "input-field")(
         inputBox
       ),
       button(`type` := "submit", cls := "btn %s".format(Colors.defaultBtn))("submit")
-      ).render
+    ).render
     val content = div(
       comment
     ).render
 
     editBody.onsubmit = {e : dom.Event => {
-        val newcomment = c.copy(body = inputBox.value)
-        update(newcomment)
-        GithubMarkdown.convert(newcomment.body, comment)
-        false
-      }
+      val newcomment = inputBox.value
+      update(c, newcomment)
+      false
     }
+  }
 
-    div(cls := "card %s white-text".format(Colors.commentBg))(
-      div(cls := "card-content")(
-        div(cls := "card-title row")(div(cls := "col s10")(c.author + " says:"), div(cls := "col s2")(a(cls := "btn btn-floating right-align", onclick := { () => {
+  div(cls := "card %s white-text".format(Colors.commentBg))(
+    div(cls := "card-content")(
+
+      div(cls := "card-title row")(div(cls := "col s10")("wiki"), div(cls := "col s2")(
+        token match {
+          case Some(token) => a(cls := "btn btn-floating right-align", onclick := { () => {
             comment.innerHTML = ""
             comment.appendChild(editBody)
           }
-        })(i(cls := "material-icons")("add")))),
-        content
-      )
-    ).render
-  }
+        }
+      )(i(cls := "material-icons")("add"))
+      case None => a.render
+    }
+  )),
+  content
+)
+).render
+}
 }

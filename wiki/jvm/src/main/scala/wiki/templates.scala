@@ -7,12 +7,31 @@ object Template{
   import scalatags.Text.svgAttrs.{width, height}
   import wiki.Graph._
 
+  val login =
+    "<!DOCTYPE html>" +
+    html(
+      head(
+        title("Trips Wiki"),
+        script(src := "https://code.jquery.com/jquery-2.1.4.min.js"),
+        //link(rel :="stylesheet", href:="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"),
+        link(rel :="stylesheet", href:="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css"),
+        script(src := "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"),
+        script(src :="//cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"),
+        meta(name :="viewport", content :="width=device-width, initial-scale=1"),
+        meta(httpEquiv:="Content-Type", content:="text/html; charset=UTF-8"),
+        script(`type`:="text/javascript", src:="/client-fastopt.js"),
+        link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")
+      ),
+      body(cls := "%s %s".format(Colors.bodyColor, Colors.bodyText), style:="height:100%;")(
+        script("wiki.ScalaJSwiki().login()")
+      )
+    )
 
   val txt =
     "<!DOCTYPE html>" +
     html(
       head(
-        title("Example Scala.js application"),
+        title("Trips Wiki"),
         script(src := "https://code.jquery.com/jquery-2.1.4.min.js"),
         //link(rel :="stylesheet", href:="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"),
         link(rel :="stylesheet", href:="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css"),
