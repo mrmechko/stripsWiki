@@ -16,7 +16,8 @@ object FileWriter {
       if(!(new File(name).exists) && old == "") {
         create(name, res)
       } else {
-        val lines = scala.io.Source.fromFile(name).mkString("\n")
+        val lines = scala.io.Source.fromFile(name).mkString.stripLineEnd//("\n")
+        println("-\n%s\n-\n%s\n-".format(lines, old))
         if (lines == old) {
           val pw = new PrintWriter(new File(name))
           pw.write(res); pw.flush; pw.close

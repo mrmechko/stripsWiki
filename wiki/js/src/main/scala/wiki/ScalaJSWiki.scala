@@ -104,7 +104,8 @@ def main(): Unit = {
         url = "/wiki/%s/%s".format(p,t),
         data = upickle.default.write((a,b))
       ).map(_.responseText).foreach { res =>
-        upickle.default.read[Option[String]](res).map(c => {
+        Data.comments = upickle.default.read[Option[String]](res)
+        Data.comments.map(c => {
           comments.innerHTML = ""
           comments.appendChild(CommentRender(c, Data.access, updateComment(p, t)))
         })
@@ -116,10 +117,9 @@ def main(): Unit = {
     dom.ext.Ajax.get(url = "/wiki/ont/%s".format(ont)).map(_.responseText).foreach{resp => {
       //dom.alert(resp)
       Data.comments = upickle.default.read[Option[String]](resp)
-      Data.comments.map(c => {
-        comments.innerHTML = ""
-        comments.appendChild(CommentRender(c, Data.access, updateComment("ont", ont)))
-      })
+      val c = Data.comments.getOrElse("")
+      comments.innerHTML = ""
+      comments.appendChild(CommentRender(c, Data.access, updateComment("ont", ont)))
     }}
   }
   val inputBox = input(placeholder:="search", id:="search", `type`:="text").render
