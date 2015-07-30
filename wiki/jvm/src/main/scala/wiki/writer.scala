@@ -5,22 +5,27 @@ object FileWriter {
   import akka.event.Logging
   import java.io._
 
+  def commitFF(path : String, user : String) : Int = {
+    import scala.sys.process._
+    Seq("./commitandpush.sh", path, user).!
+  }
 
   class FileWriterImpl extends Actor {
     //need to add committing
+
     private def write(name : String, old : String, res : String, user : String) : Boolean = {
-      println(name)
-      println(old)
-      println(res)
-      println(user)
       if(!(new File(name).exists) && old == "") {
-        create(name, res)
+        if (create(name, res)){
+          commitFF(name, user)
+          true
+        } else false
       } else {
         val lines = scala.io.Source.fromFile(name).mkString.stripLineEnd//("\n")
         println("-\n%s\n-\n%s\n-".format(lines, old))
         if (lines == old) {
           val pw = new PrintWriter(new File(name))
-          pw.write(res); pw.flush; pw.close
+          pw.write(res); pw.flush; pw.close;
+          commitFF(name, user);
           true
         } else false
       }
@@ -29,7 +34,7 @@ object FileWriter {
     private def create(name : String, res : String) : Boolean = {
       if(!(new File(name).exists)) {
         val pw = new PrintWriter(new File(name))
-        pw.write(res); pw.flush; pw.close
+        pw.write(res); pw.flush; pw.close;
         true
       } else false
     }
