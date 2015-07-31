@@ -29,6 +29,7 @@ object Data {
     case Some(o) => o.name == name
     case _ => false
   }
+  var examples : Option[String] = None
   var comments : Option[String] = None
   var access : Option[String] = None
 }
@@ -97,31 +98,46 @@ def main(): Unit = {
   val graphLink = a(href:="graph/")("graph").render
   val outputBox = div.render
   val comments = div.render
+  val examples = div.render
 
-  def updateComment(p : String, t : String) : (String, String) => Unit = {
+  def updateWiki(p : String, t : String, target : org.scalajs.dom.raw.Node) : (String, String) => Unit = {
     (a : String, b : String) => {
       dom.ext.Ajax.post(
         url = "/wiki/%s/%s".format(p,t),
         data = upickle.default.write((a,b))
-      ).map(_.responseText).foreach { res =>
-        Data.comments = upickle.default.read[Option[String]](res)
-        Data.comments.map(c => {
-          comments.innerHTML = ""
-          comments.appendChild(CommentRender(c, Data.access, updateComment(p, t)))
-        })
+      ).map(_.responseText).foreach { resp =>
+        val res = upickle.default.read[Option[String]](resp)
+        if(t == "ont")
+          Data.comments = res
+        else if(t == "examples")
+          Data.examples = res
+        val c = res.getOrElse("")
+        while(target.hasChildNodes){target.removeChild(target.firstChild)}
+        target.appendChild(CommentRender(c, Data.access, updateWiki(t, p, target)))
       }
     }
   }
-
-  def getOntComments(ont : String) = {
-    dom.ext.Ajax.get(url = "/wiki/ont/%s".format(ont)).map(_.responseText).foreach{resp => {
+  def renderWiki(query : String, t : String, target : org.scalajs.dom.raw.Node) = {
+    dom.ext.Ajax.get(url = "/wiki/%s/%s".format(t, query)).map(_.responseText).foreach{resp => {
       //dom.alert(resp)
-      Data.comments = upickle.default.read[Option[String]](resp)
-      val c = Data.comments.getOrElse("")
-      comments.innerHTML = ""
-      comments.appendChild(CommentRender(c, Data.access, updateComment("ont", ont)))
+      val res = upickle.default.read[Option[String]](resp)
+      if(t == "ont")
+        Data.comments = res
+      else if(t.startsWith("examples"))
+        Data.examples = res
+      val c = res.getOrElse("")
+      while(target.hasChildNodes){target.removeChild(target.firstChild)}
+      target.appendChild(CommentRender(c, Data.access, updateWiki(t, query, target)))
     }}
   }
+  def getOntWiki(ont : String) = {
+    renderWiki(ont, "ont", comments)
+  }
+
+  def getOntExamples(ont : String) = {
+    renderWiki(ont, "examples-ont", examples)
+  }
+
   val inputBox = input(placeholder:="search", id:="search", `type`:="text").render
   val lineProg = {
     div(cls:="progress")(div(cls:="indeterminate")).render
@@ -166,11 +182,14 @@ def main(): Unit = {
       ).render
     }
     if (Data ontIs inp) {
-      getOntComments(inp)
+      getOntWiki(inp)
+      getOntExamples(inp)
       _render(Data.ont)
     } else {
       //dom.alert("loading from server: %s".format(inp))
-      getOntComments(inp)
+      getOntWiki(inp)
+      getOntExamples(inp)
+
       Client[Api].getOnt(inp).call().foreach { result =>
         Data.ont = result
         _render(result)
@@ -264,7 +283,7 @@ dom.document.body.appendChild(
             )),
             div(cls:= "row")(
               div(cls := "col s6")(outputBox),
-              div(cls := "col s6")(comments)
+              div(cls := "col s6")(comments, examples)
             )
           )
         )

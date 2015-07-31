@@ -14,7 +14,7 @@ object AutowireServer extends autowire.Server[String, upickle.default.Reader, up
 }
 object Server extends SimpleRoutingApp with Api{
   val wikiBase = "/Users/mechko/projects/co/TripsDiscussion/wiki"
-  val wikiConts = Set("ont", "lex", "role")
+  val wikiConts = Set("ont", "lex", "role", "examples/ont", "examples/lex", "examples/role")
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
 
@@ -60,8 +60,9 @@ object Server extends SimpleRoutingApp with Api{
                 case Some(user : String) => {
                   extract(_.request.entity.asString) { e =>
                     val contents = upickle.default.read[(String, String)](e)
-                    if(wikiConts.contains(s)) {
-                      val fname = "%s/%s/%s.md".format(wikiBase,s,v)
+                    val sp = s.replaceAll("-", "/")
+                    if(wikiConts.contains(sp)) {
+                      val fname = "%s/%s/%s.md".format(wikiBase,sp,v)
                       println("writing.... %s".format(fname))
                       //(name, old, res, user
                       val res1=(writer ? WriteFile(fname, contents._1, contents._2, user))
@@ -115,8 +116,9 @@ object Server extends SimpleRoutingApp with Api{
     } ~
     get {
       path("wiki" / Segment / Segment){ (s, v) =>
-        if(wikiConts.contains(s)) {
-          val fname = "%s/%s/%s.md".format(wikiBase,s,v)
+        val sp = s.replaceAll("-", "/")
+        if(wikiConts.contains(sp)) {
+          val fname = "%s/%s/%s.md".format(wikiBase,sp,v)
           println("loading.... %s".format(fname))
           if (new java.io.File(fname).exists) {
             complete{upickle.default.write(Some(scala.io.Source.fromFile(fname).getLines.mkString("\n")))}
