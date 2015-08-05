@@ -29,7 +29,7 @@ object Server extends SimpleRoutingApp with Api{
     val writer = system.actorOf(Props[FileWriter.FileWriterImpl], name = "FileWriter")
     val loginDemon = system.actorOf(Props[FileWriter.LoginDemon], name = "LoginDemon")
 
-    startServer("0.0.0.0", port = 8080) {
+    startServer("0.0.0.0", port = 11038) {
       get{
         pathSingleSlash {
           complete{
