@@ -13,7 +13,14 @@
 
 ## Run 
 
-`sbt ~re-start`.  That's it.
+`sbt ~re-start`.  That's it.  As long as `sbt` itself doesn't crash, or no new dependencies are added, this will continue to work through new pushes.
+
+```
+export tripsXMLBase=[enter flaming-tyrion path here]/lexicon/data
+export tripsWikiBase=[enter TripsDiscussion path here]/wiki
+
+sbt ~re-start
+```
   
   
 
