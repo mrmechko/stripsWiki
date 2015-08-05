@@ -15,6 +15,8 @@
 
 `sbt ~re-start`.  That's it.  As long as `sbt` itself doesn't crash, or no new dependencies are added, this will continue to work through new pushes.
 
+For your convenience, name the script below `runme.sh` and run it.
+
 ```
 #!/bin/bash
 
