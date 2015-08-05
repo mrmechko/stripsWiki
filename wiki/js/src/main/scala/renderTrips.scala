@@ -17,7 +17,6 @@ object ListOntItemRender {
   }.render
 
   def apply(onts : (List[String], List[String]), change : String => Unit) = {
-
     div(cls := "row")(
       div(cls := "col s6")(
         for (o <- onts._1) yield p(onclick := {() => change(o)})(o)
@@ -31,8 +30,28 @@ object ListOntItemRender {
 
 object OntItemRender {
 
-  def apply(o : SArgument) : org.scalajs.dom.raw.Node = span(o.role).render
-  def apply(o : SSem) : org.scalajs.dom.raw.Node = span(o.fltype).render
+  def apply(o : SArgument) : org.scalajs.dom.raw.Node =
+        div(cls := "card-panel blue darken-3 sarg")(
+          div(cls := "white-text")(
+            div(span("role: "), (o.role)),
+            div(b("required? "), span(""+(!o.optional))),
+            div(b("feature-list type: "), span(o.fltype)),
+            ul(
+              for(pair <- o.features.feats.toList) yield li(style := "display:inline-block;padding:0.25em;margin:0.25em;border:1px solid white")(span(span(pair._1), i(raw("&rarr;")), span(pair._2)))
+            )
+          )
+        ).render
+
+  def apply(o : SSem) : org.scalajs.dom.raw.Node = {
+    div(cls := "card-panel blue darken-3", style:="padding:1em;")(
+      div(cls := "white-text")(
+        div(b("feature-list type: "), span(o.fltype)),
+        ul(
+          for(pair <- o.features.feats.toList) yield li(style := "display:inline-block;padding:0.25em;margin:0.25em;border:1px solid white")(span(span(pair._1), i(raw("&rarr;")), span(pair._2)))
+        )
+      )
+    ).render
+  }
   def apply(o : SFeatureSet) : org.scalajs.dom.raw.Node = {
     ul(cls := "sfeatureset")(
       for (f <- o.feats.toList) yield li(cls := "sfeature")(span(cls := "sfeaturename")(f._1), span(cls := "sfeatureval")(f._2))
@@ -46,19 +65,22 @@ object OntItemRender {
         h3(style := "display:inline-block;font-style:condensed;font-weight:200;")("Parent"),
         h4(style:= "margin-left:1em;display:inline-block;font-style:bold;",onclick := {() => change(o.parent)})(o.parent)
       ),
-      buildList(o.children, "Children", (s : String) =>{() => list(s, OntLookup)}, "white", Colors.accent2),
-      buildList(o.words, "Lexicon", (s : String) =>{() => list(s, WordLookup)}, "white", Colors.accent1),
-
-      buildList(o.wn, "WordNet", (s : String) =>{() => list(s, SenseLookup)}, "white", "blue darken-4"),
+        buildList(o.children, "Children", (s : String) =>{() => list(s, OntLookup)}, "white", Colors.accent2),
+        buildList(o.words, "Lexicon", (s : String) =>{() => list(s, WordLookup)}, "white", Colors.accent1),
+        buildList(o.wn, "WordNet", (s : String) =>{() => list(s, SenseLookup)}, "white", "blue darken-4"),
       div(apply(o.sem)),
-      div(id := "sontArgList")(
-        div(cls := "pure-menu pure-menu")(
-          a(cls:="pure-menu-heading")("Arguments")
-        ),
-        ul(cls := "sontSargs list pure-menu-list")(
-          for (a <- o.arguments) yield li(cls := "sontSarg pure-menu-item")(apply(a))
+      if(o.arguments.size > 0){
+      div(div(id := "sontArgList")(
+        div(cls := "card blue")(
+          div(cls := "card-content blue")(
+            div(cls := "row card-title")(span(cls:="left-align white-text")("Arguments"))
+          ),
+          div(
+            for (a <- o.arguments) yield apply(a)
+          )
         )
       )
+    )} else div()
     )
   }.render
 

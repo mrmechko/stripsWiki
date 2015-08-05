@@ -1,0 +1,102 @@
+#!/usr/bin/env /Users/mechko/bin/scalas
+
+/***
+scalaVersion := "2.11.7"
+
+libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2"
+*/
+
+val margs = args.grouped(2).map(s => s(0).stripPrefix("-")->s(1)).toMap
+
+import scala.util.parsing.combinator._
+
+object Code {
+  val lisppath = margs.getOrElse("lisp", sys.env("ontLispPath"))
+  val files = margs.getOrElse("files", "abstract-types.lisp,root-types.lisp,speech-acts.lisp,physobj.lisp,situation-types.lisp,time-location-types.lisp,predicates.lisp,specific-situation-types.lisp").split(",").toList
+  val c = new CCapture;
+  def procChunks(lines : String) : Seq[PChunk] = {
+    val chunks = lines.split("\n\n")
+    .map(chunk => {
+      Chunk(chunk.split("\n").zipWithIndex.map(l => l._2 -> l._1).toList, Some(chunk))
+    })
+    val pchunks = chunks.map(ch => ch(c))
+    pchunks.foreach(p => {
+      if(((p !) size) == 1 /*&& ((p *) size) > 1*/){
+        println("->")
+        println(p.!.mkString(", "))
+        print(p.*.mkString("\t", "\n\t","\n<-"))
+      }
+    })
+    pchunks.filter(_.!.size == 1).distinct
+  }
+  val R = """[^;]*\(define-type\s+([^;\s]+)""".r
+  //println(files.flatMap(x => scala.io.Source.fromFile(lisppath+x).getLines.collect{case R(y) => y}).size)
+
+  var ontNames =
+  files.flatMap(filename =>{
+      println(filename)
+      //need to clean out the hash pipes
+      procChunks(scala.io.Source.fromFile(lisppath+filename).getLines.mkString("\n"))//.map(ch => ch.!)
+    }
+  )
+
+  import java.io._
+
+  val outputPath = margs.getOrElse("output", sys.env("tripsUpdater")) + "/code/ont/"
+  ontNames.map(b => {
+    b.!.mkString(" ").toLowerCase.stripPrefix("ont::") -> ("*" + b.!.mkString(" ")+"*\n"+b.block)
+  }).foreach(x => {
+    val pw = new PrintWriter(new File(outputPath+x._1+".md"))
+    pw.write(x._2)
+    pw.flush
+    pw.close
+  })
+}
+
+case class Chunk(lines : List[(Int, String)], raw : Option[String] = None) {
+  def apply(c : CCapture) = PChunk(
+    {
+      lines.map(l => l._1 -> c(l._2))
+    }.collect{
+      case (index, c.Success(res, _)) => index -> res
+    }, raw
+  )
+}
+
+case class PChunk(lines : List[(Int, CommentedLine)], raw : Option[String] = None) {
+  val R = """\s*\(define-type\s+([^;\s]+)(\s+.*)*""".r
+  def ! : List[String] = {
+    lines.map(_._2).map(c => c.line.toLowerCase match {
+      case R(res,_) => Some(res)
+      case _ => {
+        if(c.line.contains("define-type")) println(c)
+        None
+      }
+    }).collect{
+      case Some(x) => x
+    }
+  }
+  def * : List[String] = lines.collect{case (_, CommentedLine(_, Some(c))) => c}
+
+  def block = raw match {
+    case Some(r) => "```lisp\n"+r+"\n```\n"
+    case _ => lines.map(_._2.mkLine).mkString("```lisp\n", "\n", "\n```\n")
+  }
+}
+
+case class CommentedLine(line : String, comment : Option[String]) {
+  def mkLine = line + comment.map(c => " "+c).getOrElse("")
+}
+
+class CCapture extends RegexParsers {
+  def skipWhiteSpace : Boolean = false
+  def code : Parser[String] = "[^;]*".r
+  def comment : Parser[String] = "(;.*)".r
+  def lineEnd : Parser[String] = "\n".r
+  def cl : Parser[CommentedLine] = code ~ (comment ?) ^^ {case a ~ c => CommentedLine(a,c)}
+  def nocode: Parser[CommentedLine] = comment ^^ {case a => CommentedLine("", Some(a))}
+  def line : Parser[CommentedLine] = (cl | nocode)
+  def apply(s : String) = parseAll(line, s)
+}
+
+Code

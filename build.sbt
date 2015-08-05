@@ -14,7 +14,7 @@ val wiki = crossProject.settings(
     "com.lihaoyi" %%% "upickle" % "0.3.4",
     "com.lihaoyi" %%% "autowire" % "0.2.5",
     "com.lihaoyi" %%% "scalatags" % "0.5.2",
-    "com.github.mrmechko" %%% "strips2" % "0.1-SNAPSHOT"
+    "com.github.mrmechko" %%% "strips2" % "0.0.1-SNAPSHOT"
   )
 ).jsSettings(
   workbenchSettings:_*

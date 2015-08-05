@@ -40,8 +40,7 @@ object Template{
         meta(name :="viewport", content :="width=device-width, initial-scale=1"),
         meta(httpEquiv:="Content-Type", content:="text/html; charset=UTF-8"),
         script(`type`:="text/javascript", src:="/client-fastopt.js"),
-        link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")
-        //script(`type`:="text/javascript", src:="//localhost:12345/workbench.js")
+        link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")        //script(`type`:="text/javascript", src:="//localhost:12345/workbench.js")
         //link(
         //  rel:="stylesheet",
         //  `type`:="text/css",

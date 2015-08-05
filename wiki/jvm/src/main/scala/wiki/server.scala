@@ -14,7 +14,7 @@ object AutowireServer extends autowire.Server[String, upickle.default.Reader, up
 }
 object Server extends SimpleRoutingApp with Api{
   val wikiBase = "/Users/mechko/projects/co/TripsDiscussion/wiki"
-  val wikiConts = Set("ont", "lex", "role", "examples/ont", "examples/lex", "examples/role")
+  val wikiConts = Set("ont", "lex", "role", "examples/ont", "examples/lex", "examples/role", "code/ont")
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
 

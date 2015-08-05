@@ -31,6 +31,7 @@ object Data {
   }
   var examples : Option[String] = None
   var comments : Option[String] = None
+  var code : Option[String] = None
   var access : Option[String] = None
 }
 
@@ -41,173 +42,185 @@ object ScalaJSwiki {
     dom.ext.Ajax.post(
       url = "/verify",
       data = "some data"
-    ).map(_.responseText).foreach{response => {
-      Data.access = upickle.default.read[Option[String]](response)
-    }}
-  }
-
-  @JSExport
-  def login(): Unit = {
-    val username = input(placeholder:="Username", id:="search", `type`:="text").render
-    val password = input(placeholder:="Password", id:="search", `type`:="password").render
-    val loginfailed = div.render
-
-    val loginHandler = {e : dom.Event => {
-      //dom.alert("requesting %s/%s".format(username.value, password.value))
-      dom.ext.Ajax.post(
-        url = "/auth",
-        data = upickle.default.write(Authenticat(username.value, password.value))
-      ).map(r => {
-        println(r)
-        r.responseText
-      }).foreach{response => {
-        if (response == "success") {
-          org.scalajs.dom.location.assign("/")
-        } else {
-          loginfailed.innerHTML = ""
-          loginfailed.appendChild(blockquote("incorrect username or password. please try again").render)
-        }
+    ).map(_.responseText).foreach{response =>
+      {
+        Data.access = upickle.default.read[Option[String]](response)
       }}
-      false;
     }
-  }
 
-  val loginForm = form(cls := "container", style := "height:100%;width:100%;", onsubmit := loginHandler)(
-    div(cls:="row %s".format(Colors.sidebar))(
-      div(cls := "col s4"),
-      div(cls := "col s4")(
-        div(cls:="input-field row")(label("search"),username),
-        div(cls:="input-field row")(label("search"),password),
-        div(cls:="input-field row")(button(cls :="waves-effect waves-light btn %s".format(Colors.defaultBtn), `type` := "submit")("login")),
-        loginfailed
-      )
-    )
-  ).render
+    @JSExport
+    def login(): Unit = {
+      val username = input(placeholder:="Username", id:="search", `type`:="text").render
+      val password = input(placeholder:="Password", id:="search", `type`:="password").render
+      val loginfailed = div.render
 
-
-
-  dom.document.body.appendChild(
-    loginForm
-  )
-}
-
-
-@JSExport
-def main(): Unit = {
-
-  val graphLink = a(href:="graph/")("graph").render
-  val outputBox = div.render
-  val comments = div.render
-  val examples = div.render
-
-  def updateWiki(p : String, t : String, target : org.scalajs.dom.raw.Node) : (String, String) => Unit = {
-    (a : String, b : String) => {
-      dom.ext.Ajax.post(
-        url = "/wiki/%s/%s".format(p,t),
-        data = upickle.default.write((a,b))
-      ).map(_.responseText).foreach { resp =>
-        val res = upickle.default.read[Option[String]](resp)
-        if(t == "ont")
-          Data.comments = res
-        else if(t == "examples")
-          Data.examples = res
-        val c = res.getOrElse("")
-        while(target.hasChildNodes){target.removeChild(target.firstChild)}
-        target.appendChild(CommentRender(c, Data.access, updateWiki(t, p, target)))
-      }
-    }
-  }
-  def renderWiki(query : String, t : String, target : org.scalajs.dom.raw.Node) = {
-    dom.ext.Ajax.get(url = "/wiki/%s/%s".format(t, query)).map(_.responseText).foreach{resp => {
-      //dom.alert(resp)
-      val res = upickle.default.read[Option[String]](resp)
-      if(t == "ont")
-        Data.comments = res
-      else if(t.startsWith("examples"))
-        Data.examples = res
-      val c = res.getOrElse("")
-      while(target.hasChildNodes){target.removeChild(target.firstChild)}
-      target.appendChild(CommentRender(c, Data.access, updateWiki(t, query, target)))
-    }}
-  }
-  def getOntWiki(ont : String) = {
-    renderWiki(ont, "ont", comments)
-  }
-
-  def getOntExamples(ont : String) = {
-    renderWiki(ont, "examples-ont", examples)
-  }
-
-  val inputBox = input(placeholder:="search", id:="search", `type`:="text").render
-  val lineProg = {
-    div(cls:="progress")(div(cls:="indeterminate")).render
-  }
-
-  inputBox.onchange = {e : dom.Event => {
-    graphLink.href = "graph/"+inputBox.value
-  }}
-
-  def listView : (String, Any) => Unit = (inp : String, lookupType : Any) => {
-    outputBox.innerHTML = ""
-    outputBox.appendChild(lineProg)
-    lookupType match {
-      case OntLookup => {
-        ontView(inp)
-      }//Use buildList instead or ListOntItemRender
-      case SenseLookup => {
-        Client[Api].getOntsFromWNSense(inp).call().foreach { result =>
-          outputBox.innerHTML = ""
-          outputBox.appendChild(
-            ListOntItemRender(result, ontView)
-          ).render
+      val loginHandler = {e : dom.Event =>
+        {
+          //dom.alert("requesting %s/%s".format(username.value, password.value))
+          dom.ext.Ajax.post(
+            url = "/auth",
+            data = upickle.default.write(Authenticat(username.value, password.value))
+          ).map(r => {
+            println(r)
+            r.responseText
+          }).foreach{response => {
+            if (response == "success") {
+              org.scalajs.dom.location.assign("/")
+            } else {
+              loginfailed.innerHTML = ""
+              loginfailed.appendChild(blockquote("incorrect username or password. please try again").render)
+            }
+          }}
+          false;
         }
       }
-      case WordLookup => {
-        Client[Api].getTripsAndWN(inp).call().foreach { result =>
-          outputBox.innerHTML = ""
-          outputBox.appendChild(
-            ListOntItemRender(result, ontView)
-          ).render
-        }
-      }
-      case _ => dom.alert("unknown")
-    }
-  }
 
-  def ontView : String => Unit = (inp : String) => {
-    def _render(result : Option[SOntItem]) {
-      outputBox.innerHTML = ""
-      outputBox.appendChild(
-        result.map(OntItemRender(_, ontView, listView)).getOrElse(div().render)
+      val loginForm = form(cls := "container", style := "height:100%;width:100%;", onsubmit := loginHandler)(
+        div(cls:="row %s".format(Colors.sidebar))(
+          div(cls := "col s4"),
+          div(cls := "col s4")(
+            div(cls:="input-field row")(label("search"),username),
+            div(cls:="input-field row")(label("search"),password),
+            div(cls:="input-field row")(button(cls :="waves-effect waves-light btn %s".format(Colors.defaultBtn), `type` := "submit")("login")),
+            loginfailed
+          )
+        )
       ).render
-    }
-    if (Data ontIs inp) {
-      getOntWiki(inp)
-      getOntExamples(inp)
-      _render(Data.ont)
-    } else {
-      //dom.alert("loading from server: %s".format(inp))
-      getOntWiki(inp)
-      getOntExamples(inp)
 
-      Client[Api].getOnt(inp).call().foreach { result =>
-        Data.ont = result
-        _render(result)
+
+
+      dom.document.body.appendChild(
+        loginForm
+      )
+    }
+
+
+    @JSExport
+    def main(): Unit = {
+
+      val graphLink = a(href:="graph/")("graph").render
+      val outputBox = div.render
+      val comments = div.render
+      val examples = div.render
+      val code = div.render
+
+      def updateWiki(p : String, t : String, target : org.scalajs.dom.raw.Node) : (String, String) => Unit = {
+        (a : String, b : String) => {
+          dom.ext.Ajax.post(
+            url = "/wiki/%s/%s".format(p,t),
+            data = upickle.default.write((a,b))
+          ).map(_.responseText).foreach { resp =>
+            val res = upickle.default.read[Option[String]](resp)
+            if(t == "ont")
+            Data.comments = res
+            else if(t == "examples")
+            Data.examples = res
+            val c = res.getOrElse("")
+            while(target.hasChildNodes){target.removeChild(target.firstChild)}
+            target.appendChild(CommentRender(c, Data.access, updateWiki(t, p, target)))
+          }
+        }
       }
+      def renderWiki(query : String, t : String, target : org.scalajs.dom.raw.Node) = {
+        dom.ext.Ajax.get(url = "/wiki/%s/%s".format(t, query)).map(_.responseText).foreach{resp => {
+          //dom.alert(resp)
+          val res = upickle.default.read[Option[String]](resp)
+          if(t == "ont")
+          Data.comments = res
+          else if(t.startsWith("examples"))
+          Data.examples = res
+          else if(t.startsWith("code"))
+          Data.code = res
+          val c = res.getOrElse("")
+          while(target.hasChildNodes){target.removeChild(target.firstChild)}
+          target.appendChild(CommentRender(c, Data.access, updateWiki(t, query, target)))
+        }}
+      }
+      def getOntWiki(ont : String) = {
+        renderWiki(ont, "ont", comments)
+      }
+
+      def getOntExamples(ont : String) = {
+        renderWiki(ont, "examples-ont", examples)
+      }
+
+      def getOntCode(ont : String) = {
+        renderWiki(ont, "code-ont", code)
+      }
+
+      val inputBox = input(placeholder:="search", id:="search", `type`:="text").render
+      val lineProg = {
+        div(cls:="progress")(div(cls:="indeterminate")).render
+      }
+
+      inputBox.onchange = {e : dom.Event => {
+        graphLink.href = "graph/"+inputBox.value
+      }}
+
+      def listView : (String, Any) => Unit = (inp : String, lookupType : Any) => {
+        outputBox.innerHTML = ""
+        outputBox.appendChild(lineProg)
+        lookupType match {
+          case OntLookup => {
+            ontView(inp)
+          }//Use buildList instead or ListOntItemRender
+          case SenseLookup => {
+            Client[Api].getOntsFromWNSense(inp).call().foreach { result =>
+              outputBox.innerHTML = ""
+              outputBox.appendChild(
+                ListOntItemRender(result, ontView)
+              ).render
+            }
+          }
+          case WordLookup => {
+            Client[Api].getTripsAndWN(inp).call().foreach { result =>
+              outputBox.innerHTML = ""
+              outputBox.appendChild(
+                ListOntItemRender(result, ontView)
+              ).render
+            }
+          }
+          case _ => dom.alert("unknown")
+        }
+      }
+
+      def ontView : String => Unit = (inp : String) => {
+        def _render(result : Option[SOntItem]) {
+          outputBox.innerHTML = ""
+          outputBox.appendChild(
+            result.map(OntItemRender(_, ontView, listView)).getOrElse(div().render)
+          ).render
+        }
+        if (Data ontIs inp) {
+          getOntWiki(inp)
+          getOntExamples(inp)
+          getOntCode(inp)
+          _render(Data.ont)
+        }
+        else {
+          //dom.alert("loading from server: %s".format(inp))
+          getOntWiki(inp)
+          getOntExamples(inp)
+          getOntCode(inp)
+
+          Client[Api].getOnt(inp).call().foreach { result =>
+            Data.ont = result
+            _render(result)
+          }
+        }
+      }
+
+      /**    def getComments(name : String) = {
+      val addComment : (Comment) => Unit = (c : Comment) => {
+      Client[Api].addComment(c).call()
     }
-  }
 
-  /**    def getComments(name : String) = {
-  val addComment : (Comment) => Unit = (c : Comment) => {
-  Client[Api].addComment(c).call()
-}
-
-Client[Api].getComments(name).call().foreach{ result =>
-Data.comments = result
-comments.innerHTML = ""
-comments.appendChild(
-result.map(CommentRender(_, addComment)).render
-)
+    Client[Api].getComments(name).call().foreach{ result =>
+    Data.comments = result
+    comments.innerHTML = ""
+    comments.appendChild(
+    result.map(CommentRender(_, addComment)).render
+  )
 }
 }**/
 
@@ -280,12 +293,11 @@ dom.document.body.appendChild(
               """$(document).ready(function() {
                 $('select').material_select();
               });"""
-            )),
-            div(cls:= "row")(
-              div(cls := "col s6")(outputBox),
-              div(cls := "col s6")(comments, examples)
+            ))),
+            div(cls := "row")(
+              div(cls := "col s4")(div(cls := "row")(outputBox)),
+              div(cls := "col s8")(div(cls := "row")(comments, examples, code))
             )
-          )
         )
       )
     ).render

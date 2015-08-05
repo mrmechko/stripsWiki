@@ -39,29 +39,32 @@ object CommentRender {
       comment
     ).render
 
-    editBody.onsubmit = {e : dom.Event => {
-      val newcomment = inputBox.value
-      update(c, newcomment)
-      false
+    editBody.onsubmit = {e : dom.Event =>
+      {
+        val newcomment = inputBox.value
+        update(c, newcomment)
+        false
+      }
     }
-  }
 
-  div(cls := "card %s white-text".format(Colors.commentBg))(
-    div(cls := "card-content")(
+    div(cls := "card %s white-text".format(Colors.commentBg))(
+      div(cls := "card-content")(
 
-      div(cls := "card-title row")(div(cls := "col s10")("%s".format(name)), div(cls := "col s2")(
-        token match {
-          case Some(token) => a(cls := "btn btn-floating right-align", onclick := { () => {
-            comment.innerHTML = ""
-            comment.appendChild(editBody)
+        div(cls := "card-title row")(div(cls := "col s10")("%s".format(name)), div(cls := "col s2")(
+          token match {
+            case Some(token) => a(cls := "btn btn-floating right-align",
+              onclick := { () =>
+                {
+                  comment.innerHTML = ""
+                  comment.appendChild(editBody)
+                }
+              }
+            )(i(cls := "material-icons")("add"))
+            case None => a.render
           }
-        }
-      )(i(cls := "material-icons")("add"))
-      case None => a.render
-    }
-  )),
-  content
-)
-).render
-}
+        )),
+        content
+      )
+    ).render
+  }
 }
