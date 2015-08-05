@@ -13,7 +13,7 @@ object AutowireServer extends autowire.Server[String, upickle.default.Reader, up
   def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
 }
 object Server extends SimpleRoutingApp with Api{
-  val wikiBase = "/Users/mechko/projects/co/TripsDiscussion/wiki"
+  val wikiBase = Paths.wikiBase
   val wikiConts = Set("ont", "lex", "role", "examples/ont", "examples/lex", "examples/role", "code/ont")
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
@@ -157,11 +157,11 @@ def list(path: String) = {
 }
 import strips.ontology._
 import strips.util.OntologyFromXML
-val ont = SOntology(OntologyFromXML("/Users/mechko/nlpTools/flaming-tyrion/lexicon/data/"))
+val ont = SOntology(OntologyFromXML(Paths.tripsXMLBase))
 
 import strips.lexicon._
 import strips.util.LexiconFromXML
-lazy val lex = new TripsLexicon(LexiconFromXML("/Users/mechko/nlpTools/flaming-tyrion/lexicon/data/"))
+lazy val lex = new TripsLexicon(LexiconFromXML(Paths.tripsXMLBase))
 
 def getOnt(name : String) = {
   ont --> name

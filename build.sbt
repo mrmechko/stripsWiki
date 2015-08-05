@@ -32,7 +32,8 @@ val wiki = crossProject.settings(
     "io.spray" %% "spray-can" % "1.3.1",
     "io.spray" %% "spray-routing" % "1.3.1",
     "com.typesafe.akka" %% "akka-actor" % "2.3.2",
-    "org.webjars" % "bootstrap" % "3.2.0"
+    "org.webjars" % "bootstrap" % "3.2.0", //don't need this anymore
+    "com.typesafe" % "config" % "1.3.0"
   )
 )
 
