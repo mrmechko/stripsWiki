@@ -65,7 +65,7 @@ object ScalaJSwiki {
             r.responseText
           }).foreach{response => {
             if (response == "success") {
-              org.scalajs.dom.location.assign(BaseUrl())
+              org.scalajs.dom.location.assign(BaseUrl()+"/")
             } else {
               loginfailed.innerHTML = ""
               loginfailed.appendChild(blockquote("incorrect username or password. please try again").render)
