@@ -5,10 +5,6 @@ case class CreateFile(name : String, res : String)
 case object WriteSuccess
 case object WriteFail
 
-case object BaseUrl {
-  def apply() : String = "/stripswiki"
-}
-
 import strips.ontology._
 
 case class Authenticat(username : String, password : String)

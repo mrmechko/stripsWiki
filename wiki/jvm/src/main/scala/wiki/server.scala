@@ -41,6 +41,30 @@ object Server extends SimpleRoutingApp with Api{
         } ~
         getFromResourceDirectory("")
       } ~
+      get {
+        path("updateandrestart") {
+          import scala.sys.process._
+          optionalCookie("token") {
+            case Some(token) => {
+              val b = BearToken(token.content)
+              val valid = (loginDemon ? b)
+              onSuccess(valid) {
+                case Some(user : String) => {
+                  if ((user == "rik") || (user == "will")) {
+                    println(Seq("cd", Paths.wikiBase) #&& "git pull" !!)
+                    println(Seq("cd", Paths.tripsXMLBase) #&& "git pull" !!)
+                    "git pull".!!
+                    complete{"update complete. please wait a few minutes"}
+                  } else {
+                    complete{"only Rik or Will can proc an update"}
+                  }
+                } case _ => complete{"authentication failed"}
+              }
+            }
+            case None => complete{"you're not logged in."}
+          }
+        }
+      } ~
       post {
         path("api" / Segments){ s =>
           extract(_.request.entity.asString) { e =>
