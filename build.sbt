@@ -28,6 +28,8 @@ val wiki = crossProject.settings(
   Revolver.settings:_*
 ).jvmSettings(
   name := "Server",
+  javaOptions += "-Xmx2G",
+  javaOptions += "-Xms2G",
   libraryDependencies ++= Seq(
     "io.spray" %% "spray-can" % "1.3.1",
     "io.spray" %% "spray-routing" % "1.3.1",
