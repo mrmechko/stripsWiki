@@ -14,7 +14,7 @@ import strips.ontology._
 object Client extends autowire.Client[String, upickle.default.Reader, upickle.default.Writer]{
   override def doCall(req: Request): Future[String] = {
     dom.ext.Ajax.post(
-      url = BaseUrl+"/api/" + req.path.mkString("/"),
+      url = BaseUrl()+"/api/" + req.path.mkString("/"),
       data = upickle.default.write(req.args)
     ).map(_.responseText)
   }
