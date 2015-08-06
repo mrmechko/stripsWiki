@@ -14,7 +14,7 @@ import strips.ontology._
 object Client extends autowire.Client[String, upickle.default.Reader, upickle.default.Writer]{
   override def doCall(req: Request): Future[String] = {
     dom.ext.Ajax.post(
-      url = "/api/" + req.path.mkString("/"),
+      url = BaseUrl+"/api/" + req.path.mkString("/"),
       data = upickle.default.write(req.args)
     ).map(_.responseText)
   }
@@ -40,7 +40,7 @@ object ScalaJSwiki {
   //removes authentication if token invalid
   def verify() : Unit = {
     dom.ext.Ajax.post(
-      url = "/verify",
+      url = BaseUrl()+"/verify",
       data = "some data"
     ).map(_.responseText).foreach{response =>
       {
@@ -58,14 +58,14 @@ object ScalaJSwiki {
         {
           //dom.alert("requesting %s/%s".format(username.value, password.value))
           dom.ext.Ajax.post(
-            url = "/auth",
+            url = BaseUrl()+"/auth",
             data = upickle.default.write(Authenticat(username.value, password.value))
           ).map(r => {
             println(r)
             r.responseText
           }).foreach{response => {
             if (response == "success") {
-              org.scalajs.dom.location.assign("/")
+              org.scalajs.dom.location.assign(BaseUrl())
             } else {
               loginfailed.innerHTML = ""
               loginfailed.appendChild(blockquote("incorrect username or password. please try again").render)
@@ -98,7 +98,7 @@ object ScalaJSwiki {
     @JSExport
     def main(): Unit = {
 
-      val graphLink = a(href:="graph/")("graph").render
+      val graphLink = a(href:=BaseUrl()+"graph/")("graph").render
       val outputBox = div.render
       val comments = div.render
       val examples = div.render
@@ -107,7 +107,7 @@ object ScalaJSwiki {
       def updateWiki(p : String, t : String, target : org.scalajs.dom.raw.Node) : (String, String) => Unit = {
         (a : String, b : String) => {
           dom.ext.Ajax.post(
-            url = "/wiki/%s/%s".format(p,t),
+            url = BaseUrl()+"/wiki/%s/%s".format(p,t),
             data = upickle.default.write((a,b))
           ).map(_.responseText).foreach { resp =>
             val res = upickle.default.read[Option[String]](resp)
@@ -122,7 +122,7 @@ object ScalaJSwiki {
         }
       }
       def renderWiki(query : String, t : String, target : org.scalajs.dom.raw.Node) = {
-        dom.ext.Ajax.get(url = "/wiki/%s/%s".format(t, query)).map(_.responseText).foreach{resp => {
+        dom.ext.Ajax.get(url = BaseUrl()+"/wiki/%s/%s".format(t, query)).map(_.responseText).foreach{resp => {
           //dom.alert(resp)
           val res = upickle.default.read[Option[String]](resp)
           if(t == "ont")
@@ -154,7 +154,7 @@ object ScalaJSwiki {
       }
 
       inputBox.onchange = {e : dom.Event => {
-        graphLink.href = "graph/"+inputBox.value
+        graphLink.href = BaseUrl()+"graph/"+inputBox.value
       }}
 
       def listView : (String, Any) => Unit = (inp : String, lookupType : Any) => {
@@ -276,14 +276,14 @@ dom.document.body.appendChild(
       div(cls :="nav-wrapper container")(
         a(href:="#", cls:="brand-logo", style:="font-weight:200;")("Trips Wiki"),
         ul(id:="nav-mobile", cls:="right hide-on-med-and-down")(
-          li(a(href:="/")("browser")),
+          li(a(href:=BaseUrl()+"/")("browser")),
           li(graphLink),
-          li(a(href:="/login")("login"))
+          li(a(href:=BaseUrl()+"/login")("login"))
         )
       )
     ),
     div(cls:= "row", id:="main", style := "height:100%;")(
-      div("cookie is: "+dom.document.cookie),
+      //div("cookie is: "+dom.document.cookie),
       div(cls := "col s12 %s %s".format(Colors.bodyColor, Colors.bodyText), style := "height:100%;")(
         div(cls := "container")(
           //p("Enter an ont name"),

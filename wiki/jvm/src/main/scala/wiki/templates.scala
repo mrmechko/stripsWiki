@@ -23,7 +23,7 @@ object Template{
         link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")
       ),
       body(cls := "%s %s".format(Colors.bodyColor, Colors.bodyText), style:="height:100%;")(
-        script("wiki.ScalaJSwiki().login()")
+        script(BaseUrl()+"/wiki.ScalaJSwiki().login()")
       )
     )
 
@@ -48,7 +48,7 @@ object Template{
         //)
       ),
       body(cls := "%s %s".format(Colors.bodyColor, Colors.bodyText))(
-        script("wiki.ScalaJSwiki().main()")
+        script(BaseUrl()+"/wiki.ScalaJSwiki().main()")
       )
     )
     def buildGraph(word : String, graph : GGraph) = {
