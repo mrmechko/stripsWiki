@@ -6,7 +6,7 @@ case object WriteSuccess
 case object WriteFail
 
 case object BaseUrl {
-  def apply() : String = "stripswiki"
+  def apply() : String = "/stripswiki"
 }
 
 import strips.ontology._
