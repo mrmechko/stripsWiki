@@ -19,11 +19,11 @@ object Template{
         script(src :="//cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"),
         meta(name :="viewport", content :="width=device-width, initial-scale=1"),
         meta(httpEquiv:="Content-Type", content:="text/html; charset=UTF-8"),
-        script(`type`:="text/javascript", src:="/client-fastopt.js"),
+        script(`type`:="text/javascript", src:=BaseUrl()+"/client-fastopt.js"),
         link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")
       ),
       body(cls := "%s %s".format(Colors.bodyColor, Colors.bodyText), style:="height:100%;")(
-        script(BaseUrl()+"/wiki.ScalaJSwiki().login()")
+        script("wiki.ScalaJSwiki().login()")
       )
     )
 
@@ -39,7 +39,7 @@ object Template{
         script(src :="//cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"),
         meta(name :="viewport", content :="width=device-width, initial-scale=1"),
         meta(httpEquiv:="Content-Type", content:="text/html; charset=UTF-8"),
-        script(`type`:="text/javascript", src:="/client-fastopt.js"),
+        script(`type`:="text/javascript", src:=BaseUrl()+"/client-fastopt.js"),
         link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")        //script(`type`:="text/javascript", src:="//localhost:12345/workbench.js")
         //link(
         //  rel:="stylesheet",
@@ -48,7 +48,7 @@ object Template{
         //)
       ),
       body(cls := "%s %s".format(Colors.bodyColor, Colors.bodyText))(
-        script(BaseUrl()+"/wiki.ScalaJSwiki().main()")
+        script("wiki.ScalaJSwiki().main()")
       )
     )
     def buildGraph(word : String, graph : GGraph) = {
