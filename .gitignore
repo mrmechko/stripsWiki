@@ -81,4 +81,3 @@ project/boot/
 .cache
 
 runme.sh
-wiki/shared/src/main/scala/wiki/baseurl.scala

@@ -98,7 +98,7 @@ object ScalaJSwiki {
     @JSExport
     def main(): Unit = {
 
-      val graphLink = a(href:=BaseUrl()+"graph/")("graph").render
+      val graphLink = a(href:=BaseUrl()+"/graph/")("graph").render
       val outputBox = div.render
       val comments = div.render
       val examples = div.render

@@ -202,7 +202,7 @@ def getOntsFromWordWN(word : String) : List[String] = {
 }
 
 def getTripsAndWN(word : String) : (List[String], List[String]) = {
-  val forms = (lex % word)
+  val forms = (lex % word) + word
   (forms.flatMap(f=>getOntsFromWordWN(f)).toList,
   forms.flatMap(f => (lex --> f).flatMap(_.classes.map(_.ontType))).toList)
 }
