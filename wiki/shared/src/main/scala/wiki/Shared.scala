@@ -16,12 +16,12 @@ case class RegisterToken(user : String, token : String)
 case class BearToken(token : String)
 
 object Colors {
-  val base1 = "blue"
+  val base1 = "green"
   val base2 = "indigo"
   val bodyColor = "%s accent-2".format(base1)
   val bodyText = "white-text"
   val container = base2
-  val commentBg = "blue darken-4"
+  val commentBg = "%s darken-4".format(base1)
   val containerText = "white-text"
   val navColor = "%s darken-4".format(base2)
   val defaultBtn = base1
