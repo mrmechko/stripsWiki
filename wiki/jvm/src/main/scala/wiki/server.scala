@@ -51,9 +51,9 @@ object Server extends SimpleRoutingApp with Api{
               onSuccess(valid) {
                 case Some(user : String) => {
                   if ((user == "rik") || (user == "will")) {
-                    println(Seq("cd", Paths.wikiBase) #&& "git pull" !!)
-                    println(Seq("cd", Paths.tripsXMLBase) #&& "git pull" !!)
-                    "git pull".!!
+                    println(Seq("cd", Paths.wikiBase) #&& "git pull origin master" !!)
+                    println(Seq("cd", Paths.tripsXMLBase) #&& "git pull origin master" !!)
+                    "git pull origin master".!!
                     complete{"update complete. please wait a few minutes"}
                   } else {
                     complete{"only Rik or Will can proc an update"}
