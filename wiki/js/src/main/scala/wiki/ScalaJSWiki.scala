@@ -154,7 +154,7 @@ object ScalaJSwiki {
       }
 
       inputBox.onchange = {e : dom.Event => {
-        graphLink.href = BaseUrl()+"graph/"+inputBox.value
+        graphLink.href = BaseUrl()+"/graph/"+inputBox.value
       }}
 
       def listView : (String, Any) => Unit = (inp : String, lookupType : Any) => {
