@@ -7,7 +7,10 @@ object FileWriter {
 
   def commitFF(path : String, user : String) : Int = {
     import scala.sys.process._
-    Seq("./commitandpush.sh", path, user).!
+    println(Seq("git", "-C", Paths.wikiBase, "add", path) !!)
+    println(Seq("git", "-C", Paths.wikiBase, "commit", "-m", "%s modified %s".format(user, path.split("/").last)) !!)
+    println(Seq("git", "-C", Paths.wikiBase, "push", "origin", "master") !!)
+    1
   }
 
   class FileWriterImpl extends Actor {
