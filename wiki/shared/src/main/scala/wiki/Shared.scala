@@ -16,7 +16,7 @@ case class RegisterToken(user : String, token : String)
 case class BearToken(token : String)
 
 object Colors {
-  val base1 = "green"
+  val base1 = "blue"
   val base2 = "indigo"
   val bodyColor = "%s accent-2".format(base1)
   val bodyText = "white-text"
