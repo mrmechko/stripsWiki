@@ -3,15 +3,16 @@ import wiki._
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import org.scalajs.dom
 
+import scala.scalajs.js
+import js.annotation._
+@JSName("marked")
+object Marked extends js.Object {
+  def apply(x: String): String = js.native
+}
+
 object Formatter {
   def convert(text : String, target : dom.Element) : Unit = {
-    dom.ext.Ajax.post(
-      url = "https://api.github.com/markdown/raw",
-      data = text,
-      headers = Map[String, String]("Content-Type" -> "text/plain")
-    ).map(_.responseText).foreach { result =>
-      target.innerHTML = result
-    }
+    target.innerHTML = Marked(text)
   }
 }
 

@@ -40,6 +40,13 @@ object Server extends SimpleRoutingApp with Api {
           getFromResourceDirectory("")
       } ~
         get {
+          path("markdowntest") {
+            complete {
+              HttpEntity(
+                MediaTypes.`text/html`,
+                Template.markdownTest)
+            }
+          } ~
           path("updateandrestart") {
             import scala.sys.process._
             optionalCookie("token") {
