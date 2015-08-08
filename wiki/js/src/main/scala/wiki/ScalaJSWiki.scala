@@ -33,6 +33,7 @@ object Data {
   var comments : Option[String] = None
   var code : Option[String] = None
   var access : Option[String] = None
+  private var _history : List[String] = List()
 }
 
 @JSExport
@@ -105,8 +106,11 @@ object ScalaJSwiki {
       val code = div.render
 
       val ontMode : () => org.scalajs.dom.raw.Node = () => {div(cls:="row")(
+        div(cls := "col s1")(),
         div(cls := "col s4")(div(cls := "row")(outputBox)),
-        div(cls := "col s8")(div(cls := "row")(comments, examples, code))
+        div(cls := "col s1")(),
+        div(cls := "col s5")(div(cls := "row")(comments, examples, code)),
+        div(cls := "col s1")()
       ).render}
 
       val listMode : () => org.scalajs.dom.raw.Node = () => {div(cls:="row")(
@@ -203,7 +207,7 @@ object ScalaJSwiki {
       def ontView : String => Unit = (inp : String) => {
         theView.innerHTML = ""
         theView.appendChild(ontMode())
-        
+
         def _render(result : Option[SOntItem]) {
           outputBox.innerHTML = ""
           outputBox.appendChild(

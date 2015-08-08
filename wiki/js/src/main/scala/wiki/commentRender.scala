@@ -3,7 +3,7 @@ import wiki._
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import org.scalajs.dom
 
-object GithubMarkdown {
+object Formatter {
   def convert(text : String, target : dom.Element) : Unit = {
     dom.ext.Ajax.post(
       url = "https://api.github.com/markdown/raw",
@@ -28,7 +28,7 @@ object CommentRender {
     val inputBox = textarea(cls := "materialize-textarea", `type`:="text", id:="%sEdit".format(name)).render
     inputBox.value = c
 
-    GithubMarkdown.convert(c, comment)
+    Formatter.convert(c, comment)
     val editBody = form(
       div(cls := "input-field")(
         inputBox

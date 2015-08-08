@@ -7,20 +7,26 @@ object Template{
   import scalatags.Text.svgAttrs.{width, height}
   import wiki.Graph._
 
+  val materializecss = link(rel :="stylesheet", href:=BaseUrl()+"/css/materialize.min.css")
+  val materializejs = script(src := BaseUrl()+"/js/materialize.min.js")
+  val markedown = script(src := BaseUrl()+"/js/marked.min.js")
+  val listjs = script(src := BaseUrl()+"/js/list.min.js")
+  val jquery = script(src := BaseUrl()+"/js/jquery-2.1.4.min.js")
+  val materialicons = link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")
+
   val login =
     "<!DOCTYPE html>" +
     html(
       head(
         title("Trips Wiki"),
-        script(src := "https://code.jquery.com/jquery-2.1.4.min.js"),
+        jquery,
         //link(rel :="stylesheet", href:="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"),
-        link(rel :="stylesheet", href:="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css"),
-        script(src := "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"),
-        script(src :="//cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"),
+        materializecss,
+        materializejs,
+        materialicons,
         meta(name :="viewport", content :="width=device-width, initial-scale=1"),
         meta(httpEquiv:="Content-Type", content:="text/html; charset=UTF-8"),
-        script(`type`:="text/javascript", src:=BaseUrl()+"/client-fastopt.js"),
-        link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")
+        script(`type`:="text/javascript", src:=BaseUrl()+"/client-fastopt.js")
       ),
       body(cls := "%s %s".format(Colors.bodyColor, Colors.bodyText), style:="height:100%;")(
         script("wiki.ScalaJSwiki().login()")
@@ -32,20 +38,15 @@ object Template{
     html(
       head(
         title("Trips Wiki"),
-        script(src := "https://code.jquery.com/jquery-2.1.4.min.js"),
+        jquery,
         //link(rel :="stylesheet", href:="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"),
-        link(rel :="stylesheet", href:="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css"),
-        script(src := "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"),
-        script(src :="//cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"),
+        materializecss,
+        materializejs,
+        materialicons,
+        listjs,
         meta(name :="viewport", content :="width=device-width, initial-scale=1"),
         meta(httpEquiv:="Content-Type", content:="text/html; charset=UTF-8"),
-        script(`type`:="text/javascript", src:=BaseUrl()+"/client-fastopt.js"),
-        link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")        //script(`type`:="text/javascript", src:="//localhost:12345/workbench.js")
-        //link(
-        //  rel:="stylesheet",
-        //  `type`:="text/css",
-        //  href:="META-INF/resources/webjars/bootstrap/3.2.0/css/bootstrap.min.css"
-        //)
+        script(`type`:="text/javascript", src:=BaseUrl()+"/client-fastopt.js")
       ),
       body(cls := "%s %s".format(Colors.bodyColor, Colors.bodyText))(
         script("wiki.ScalaJSwiki().main()")
@@ -55,8 +56,8 @@ object Template{
       "<!DOCTYPE html>" +
       html(
         head(
-          script(src:="http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js"),
-          script(src:="http://d3js.org/d3.v3.min.js", charset:="utf-8")
+          script(src:=BaseUrl()+"/js/dagre-d3.min.js"),
+          script(src:=BaseUrl()+"/js/d3.v3.min.js", charset:="utf-8")
         ),
         body(
           raw(
