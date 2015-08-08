@@ -174,8 +174,6 @@ object ScalaJSwiki {
         outputBox.appendChild(lineProg)
         lookupType match {
           case OntLookup => {
-            theView.innerHTML = ""
-            theView.appendChild(ontMode())
             ontView(inp)
           }//Use buildList instead or ListOntItemRender
           case SenseLookup => {
@@ -203,6 +201,9 @@ object ScalaJSwiki {
       }
 
       def ontView : String => Unit = (inp : String) => {
+        theView.innerHTML = ""
+        theView.appendChild(ontMode())
+        
         def _render(result : Option[SOntItem]) {
           outputBox.innerHTML = ""
           outputBox.appendChild(
