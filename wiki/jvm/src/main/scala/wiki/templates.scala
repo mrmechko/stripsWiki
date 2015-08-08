@@ -13,20 +13,30 @@ object Template{
   val listjs = script(src := BaseUrl()+"/js/list.min.js")
   val jquery = script(src := BaseUrl()+"/js/jquery-2.1.4.min.js")
   val materialicons = link(href:="https://fonts.googleapis.com/icon?family=Material+Icons", rel:="stylesheet")
+  val treeview = script(src:="//cdn.jsdelivr.net/jquery.fancytree/2.11.0/jquery.fancytree.min.js")
+  val jqueryui = script(src := "//code.jquery.com/ui/1.11.4/jquery-ui.js")
 
-  val markdownTest =
+  val treeViewTest =
     "<!DOCtYPE html>" +
     html(
       head(
         meta(content:="charset=UTF-8"),
-        title("Marked in the browser"),
-        markdown
+        title("Treeview Test"),
+        jquery,
+        jqueryui,
+        treeview
       ),
       body(
-        div(id:="content")(),
+        div(id:="tree")(),
         script(
-          raw("""document.getElementById('content').innerHTML =
-            marked('# Marked in browser\n\nRendered by **marked**.');""")
+          raw("""
+            $("#tree").fancytree({
+              source: {
+                url: "%s/listNodes?node=root"
+              },
+              clickFolderMode : 3
+            });
+          """.format(BaseUrl()))
           )
         )
       ).render

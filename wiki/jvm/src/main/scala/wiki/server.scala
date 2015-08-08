@@ -40,11 +40,16 @@ object Server extends SimpleRoutingApp with Api {
           getFromResourceDirectory("")
       } ~
         get {
-          path("markdowntest") {
-            complete {
+          path("listNodes") {
+            parameters('node, '_) { (node, thing) =>
+              complete(write(TreeView.tree(node)))
+            }
+          } ~ path("treeviewtest") {
+            complete{
               HttpEntity(
                 MediaTypes.`text/html`,
-                Template.markdownTest)
+                Template.treeViewTest
+              )
             }
           } ~
           path("updateandrestart") {
@@ -250,5 +255,17 @@ object Server extends SimpleRoutingApp with Api {
     //repace the existing one if it does
     val rel = comments(comment.target).filter(x => x.uuid != comment.uuid) + comment
     comments = comments.updated(comment.target, rel)
+  }
+
+  object TreeView {
+    def tree(s : String) : Option[TreeNode] = {
+      (ont --> s).map(n =>
+        TreeNode(
+          n.name,
+          n.name,
+          (n.children.size > 0),
+          n.children.map(tree(_)).collect{case Some(child) => child})
+        )
+    }
   }
 }

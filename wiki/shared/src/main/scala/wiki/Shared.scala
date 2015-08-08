@@ -7,6 +7,8 @@ case object WriteFail
 
 import strips.ontology._
 
+case class TreeNode(title : String, key : String, folder : Boolean, children : List[TreeNode])
+
 case class Authenticat(username : String, password : String)
 trait credentials
 case class LoginS(username : String, token : String) extends credentials

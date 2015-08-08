@@ -14,14 +14,13 @@ object Formatter {
   def convert(text : String, target : dom.Element) : Unit = {
     target.innerHTML = Marked(text)
   }
+
+
 }
 
 object CommentRender {
   import scalatags.JsDom._
   import scalatags.JsDom.all._
-
-
-
   //update : (String, Option[String]) => Unit
   def apply(c : String, token : Option[String], update : (String, String) => Unit, name : String = "Wiki") : org.scalajs.dom.raw.Node = {
     //dom.alert("loading: %s".format(c))
@@ -48,7 +47,7 @@ object CommentRender {
       }
     }
 
-    div(cls := "card %s white-text".format(Colors.commentBg))(
+    div(cls := "card %s %s".format(Colors.commentBg, Colors.containerText))(
       div(cls := "card-content")(
 
         div(cls := "card-title row")(div(cls := "col s10")("%s".format(name)), div(cls := "col s2")(

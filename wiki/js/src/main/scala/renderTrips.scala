@@ -19,11 +19,11 @@ object ListOntItemRender {
   def apply(onts : (List[String], List[String]), change : String => Unit) = {
     div(cls := "row")(
       div(cls := "col s6")(
-        p("wordnet"),
+        h6("wordnet"),
         div(for (o <- onts._1) yield p(onclick := {() => change(o)})(o))
       ),
       div(cls := "col s6")(
-        p("lexicon"),
+        h6("lexicon"),
         div(for (o <- onts._2) yield p(onclick := {() => change(o)})(o))
       )
     )
@@ -34,7 +34,7 @@ object OntItemRender {
 
   def apply(o : SArgument) : org.scalajs.dom.raw.Node =
         div(cls := "card-panel blue darken-3 sarg")(
-          div(cls := "white-text")(
+          div(cls := "%s".format(Colors.containerText))(
             div(span("role: "), (o.role)),
             div(b("required? "), span(""+(!o.optional))),
             div(b("feature-list type: "), span(o.fltype)),
@@ -45,8 +45,8 @@ object OntItemRender {
         ).render
 
   def apply(o : SSem) : org.scalajs.dom.raw.Node = {
-    div(cls := "card-panel blue darken-3", style:="padding:1em;")(
-      div(cls := "white-text")(
+    div(cls := "card-panel %s darken-3".format(Colors.base1), style:="padding:1em;")(
+      div(cls := "%s".format(Colors.containerText))(
         div(b("feature-list type: "), span(o.fltype)),
         ul(
           for(pair <- o.features.feats.toList) yield li(style := "display:inline-block;padding:0.25em;margin:0.25em;border:1px solid white")(span(span(pair._1), i(raw("&rarr;")), span(pair._2)))
@@ -75,7 +75,7 @@ object OntItemRender {
       div(div(id := "sontArgList")(
         div(cls := "card blue")(
           div(cls := "card-content blue")(
-            div(cls := "row card-title")(span(cls:="left-align white-text")("Arguments"))
+            div(cls := "row card-title")(span(cls:="left-align %s".format(Colors.containerText))("Arguments"))
           ),
           div(
             for (a <- o.arguments) yield apply(a)
@@ -87,7 +87,7 @@ object OntItemRender {
   }.render
 
   def buildList(elements : List[String], key : String, callback : (String) => () => Unit, tagcolor : String = "white", contcolor : String = "white") = {
-    val clsMod2 = if (contcolor == "white") ""; else " white-text"
+    val clsMod2 = if (contcolor == "white") ""; else " %s".format(Colors.containerText)
 
     if(elements.size == 0) div().render
     else

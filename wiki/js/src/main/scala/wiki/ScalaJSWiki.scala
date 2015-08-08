@@ -105,12 +105,13 @@ object ScalaJSwiki {
       val examples = div.render
       val code = div.render
 
-      val ontMode : () => org.scalajs.dom.raw.Node = () => {div(cls:="row")(
-        div(cls := "col s1")(),
-        div(cls := "col s4")(div(cls := "row")(outputBox)),
-        div(cls := "col s1")(),
-        div(cls := "col s5")(div(cls := "row")(comments, examples, code)),
-        div(cls := "col s1")()
+      val ontMode : () => org.scalajs.dom.raw.Node = () => {
+        div(cls:="row")(
+          div(cls := "col s1")(" "),
+          div(cls := "col s4")(div(cls := "row")(outputBox)),
+          div(cls := "col s1")(" "),
+          div(cls := "col s5")(div(cls := "row")(comments, examples, code)),
+          div(cls := "col s1")(" ")
       ).render}
 
       val listMode : () => org.scalajs.dom.raw.Node = () => {div(cls:="row")(
@@ -137,7 +138,7 @@ object ScalaJSwiki {
           }
         }
       }
-      def renderWiki(query : String, t : String, target : org.scalajs.dom.raw.Node) = {
+      def renderWiki(query : String, t : String, target : org.scalajs.dom.raw.Node, name : String) = {
         dom.ext.Ajax.get(url = BaseUrl()+"/wiki/%s/%s".format(t, query)).map(_.responseText).foreach{resp => {
           //dom.alert(resp)
           val res = upickle.default.read[Option[String]](resp)
@@ -149,19 +150,19 @@ object ScalaJSwiki {
           Data.code = res
           val c = res.getOrElse("")
           while(target.hasChildNodes){target.removeChild(target.firstChild)}
-          target.appendChild(CommentRender(c, Data.access, updateWiki(t, query, target)))
+          target.appendChild(CommentRender(c, Data.access, updateWiki(t, query, target), name))
         }}
       }
       def getOntWiki(ont : String) = {
-        renderWiki(ont, "ont", comments)
+        renderWiki(ont, "ont", comments, "Wiki")
       }
 
       def getOntExamples(ont : String) = {
-        renderWiki(ont, "examples-ont", examples)
+        renderWiki(ont, "examples-ont", examples, "Examples")
       }
 
       def getOntCode(ont : String) = {
-        renderWiki(ont, "code-ont", code)
+        renderWiki(ont, "code-ont", code, "Code")
       }
 
       val inputBox = input(placeholder:="search", id:="search", `type`:="text").render
