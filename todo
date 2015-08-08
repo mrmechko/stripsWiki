@@ -2,8 +2,10 @@
 2.    allow different sense formats
 3.    organize the code before it explodes
 6.    going to need a second page with a list of forms for proposed modifications
-7.    Fork wdbeaum/DeepSemLex and clean up the lisp files, 1 per ont type
+7.    add a tags field
 8.    create commented-code box, editable only by james.
 9.    post-edit hooks: ont-rename
 9.    Potentially include an actual password
 10.   Post-edit modifications and file grepper
+11.   figure out a backup cdn for offline use
+

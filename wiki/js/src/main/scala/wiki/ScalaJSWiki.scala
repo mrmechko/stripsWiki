@@ -104,6 +104,18 @@ object ScalaJSwiki {
       val examples = div.render
       val code = div.render
 
+      val ontMode : () => org.scalajs.dom.raw.Node = () => {div(cls:="row")(
+        div(cls := "col s4")(div(cls := "row")(outputBox)),
+        div(cls := "col s8")(div(cls := "row")(comments, examples, code))
+      ).render}
+
+      val listMode : () => org.scalajs.dom.raw.Node = () => {div(cls:="row")(
+        div(cls := "col s12")(div(cls := "container")(outputBox))
+      ).render}
+
+      val theView = div.render
+
+
       def updateWiki(p : String, t : String, target : org.scalajs.dom.raw.Node) : (String, String) => Unit = {
         (a : String, b : String) => {
           dom.ext.Ajax.post(
@@ -162,10 +174,14 @@ object ScalaJSwiki {
         outputBox.appendChild(lineProg)
         lookupType match {
           case OntLookup => {
+            theView.innerHTML = ""
+            theView.appendChild(ontMode())
             ontView(inp)
           }//Use buildList instead or ListOntItemRender
           case SenseLookup => {
             Client[Api].getOntsFromWNSense(inp).call().foreach { result =>
+              theView.innerHTML = ""
+              theView.appendChild(listMode())
               outputBox.innerHTML = ""
               outputBox.appendChild(
                 ListOntItemRender(result, ontView)
@@ -174,6 +190,8 @@ object ScalaJSwiki {
           }
           case WordLookup => {
             Client[Api].getTripsAndWN(inp).call().foreach { result =>
+              theView.innerHTML = ""
+              theView.appendChild(listMode())
               outputBox.innerHTML = ""
               outputBox.appendChild(
                 ListOntItemRender(result, ontView)
@@ -294,10 +312,7 @@ dom.document.body.appendChild(
                 $('select').material_select();
               });"""
             ))),
-            div(cls := "row")(
-              div(cls := "col s4")(div(cls := "row")(outputBox)),
-              div(cls := "col s8")(div(cls := "row")(comments, examples, code))
-            )
+            theView
         )
       )
     ).render

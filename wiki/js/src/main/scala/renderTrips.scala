@@ -19,10 +19,12 @@ object ListOntItemRender {
   def apply(onts : (List[String], List[String]), change : String => Unit) = {
     div(cls := "row")(
       div(cls := "col s6")(
-        for (o <- onts._1) yield p(onclick := {() => change(o)})(o)
+        p("wordnet"),
+        div(for (o <- onts._1) yield p(onclick := {() => change(o)})(o))
       ),
       div(cls := "col s6")(
-        for (o <- onts._2) yield p(onclick := {() => change(o)})(o)
+        p("lexicon"),
+        div(for (o <- onts._2) yield p(onclick := {() => change(o)})(o))
       )
     )
   }.render
