@@ -11,7 +11,7 @@ val margs = args.grouped(2).map(s => s(0).stripPrefix("-")->s(1)).toMap
 import scala.util.parsing.combinator._
 
 object Code {
-  val lisppath = margs.getOrElse("lisp", sys.env("ontLispPath"))
+  val lisppath = margs.getOrElse("lisp", sys.env("tripsOntLispPath"))
   val files = margs.getOrElse("files", "abstract-types.lisp,root-types.lisp,speech-acts.lisp,physobj.lisp,situation-types.lisp,time-location-types.lisp,predicates.lisp,specific-situation-types.lisp").split(",").toList
   val c = new CCapture;
   def procChunks(lines : String) : Seq[PChunk] = {
@@ -42,7 +42,7 @@ object Code {
 
   import java.io._
 
-  val outputPath = margs.getOrElse("output", sys.env("tripsUpdater")) + "/code/ont/"
+  val outputPath = margs.getOrElse("output", sys.env("tripsWikiBase")) + "/code/ont/"
   ontNames.map(b => {
     b.!.mkString(" ").toLowerCase.stripPrefix("ont::") -> ("*" + b.!.mkString(" ")+"*\n"+b.block)
   }).foreach(x => {

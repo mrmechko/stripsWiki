@@ -11,6 +11,10 @@ import upickle.default._
 import autowire._
 import strips.ontology._
 
+import org.scalajs.jquery.jQuery
+import Materialize._
+
+
 object Client extends autowire.Client[String, upickle.default.Reader, upickle.default.Writer]{
   override def doCall(req: Request): Future[String] = {
     dom.ext.Ajax.post(
@@ -98,6 +102,12 @@ object ScalaJSwiki {
 
     @JSExport
     def main(): Unit = {
+
+      jQuery(dom.document).ready(
+        () => {
+          jQuery("select").material_select()
+        }
+      )
 
       val graphLink = a(href:=BaseUrl()+"/graph/")("graph").render
       val outputBox = div.render
@@ -197,7 +207,14 @@ object ScalaJSwiki {
               theView.appendChild(listMode())
               outputBox.innerHTML = ""
               outputBox.appendChild(
-                ListOntItemRender(result, ontView)
+                div(cls:="row")(
+                  div(cls:="col s6")(
+                    OntItemRender.buildList(result._1, "wordnet", (s : String) =>{() => listView(s, OntLookup)}, "white", "blue darken-4")
+                  ),
+                  div(cls:="col s6")(
+                    OntItemRender.buildList(result._2, "trips", (s : String) =>{() => listView(s, OntLookup)}, "white", Colors.accent2)
+                  )
+                ).render
               ).render
             }
           }
@@ -311,14 +328,9 @@ dom.document.body.appendChild(
       div(cls := "col s12 %s %s".format(Colors.bodyColor, Colors.bodyText), style := "height:100%;")(
         div(cls := "container")(
           //p("Enter an ont name"),
-          theForm,
-          script(
-            raw(
-              """$(document).ready(function() {
-                $('select').material_select();
-              });"""
-            ))),
-            theView
+          theForm
+        ),
+          theView
         )
       )
     ).render
