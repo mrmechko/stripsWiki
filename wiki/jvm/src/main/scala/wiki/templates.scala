@@ -17,7 +17,7 @@ object Template{
   val jqueryui = script(src := "//code.jquery.com/ui/1.11.4/jquery-ui.js")
 
   val treeViewTest =
-    "<!DOCtYPE html>" +
+    "<!DOCTYPE html>" +
     html(
       head(
         meta(content:="charset=UTF-8"),
