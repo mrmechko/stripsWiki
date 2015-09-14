@@ -11,6 +11,7 @@ object AutowireServer extends autowire.Server[String, upickle.default.Reader, up
   def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
   def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
 }
+
 object Server extends SimpleRoutingApp with Api {
   val wikiBase = Paths.wikiBase
   val wikiConts = Set("ont", "lex", "role", "examples/ont", "examples/lex", "examples/role", "code/ont")
@@ -23,7 +24,7 @@ object Server extends SimpleRoutingApp with Api {
     import akka.util.Timeout
     import scala.concurrent.duration._
 
-    implicit val timeout = Timeout(15 seconds)
+    implicit val timeout = Timeout(16 seconds)
 
     val writer = system.actorOf(Props[FileWriter.FileWriterImpl], name = "FileWriter")
     val loginDemon = system.actorOf(Props[FileWriter.LoginDemon], name = "LoginDemon")
