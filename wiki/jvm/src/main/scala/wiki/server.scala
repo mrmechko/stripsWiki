@@ -13,7 +13,7 @@ object AutowireServer extends autowire.Server[String, upickle.default.Reader, up
 }
 
 object Server extends SimpleRoutingApp with Api {
-  val serverDate = "December-14-10am-2015"
+  val serverDate = "sept-22-10am-2016"
   val wikiBase = Paths.wikiBase
   val wikiConts = Set("ont", "lex", "role", "examples/ont", "examples/lex", "examples/role", "code/ont")
   def main(args: Array[String]): Unit = {
